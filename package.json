@@ -1,5 +1,5 @@
 {
-  "name": "formik",
+  "name": "@rexlabs/formik",
   "description": "Forms in React, without tears",
   "version": "1.0.0-alpha.6",
   "license": "MIT",
