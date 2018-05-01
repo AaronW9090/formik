@@ -5,7 +5,7 @@
     "declarationDir": "dist",
     "emitDecoratorMetadata": false,
     "experimentalDecorators": false,
-    "importHelpers": true,
+    "importHelpers": false,
     "jsx": "react",
     "lib": ["es2015", "dom"],
     "module": "esnext",
