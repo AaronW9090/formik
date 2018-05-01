@@ -233,6 +233,12 @@ export type FormikProps<Values> = FormikState<Values> &
   FormikHandlers &
   FormikComputedProps<Values>;
 
+export type FastFieldConnectors = {
+  reset: (nextValues?: any) => void;
+  setValue: (nextValue?: any) => void;
+  setError: (nextError?: any) => void;
+};
+
 export class Formik<ExtraProps = {}, Values = object> extends React.Component<
   FormikConfig<Values> & ExtraProps,
   FormikState<any>
@@ -271,7 +277,9 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
   hbCache: {
     [key: string]: (e: any) => void;
   } = {};
-  fields: { [field: string]: (nextValues?: any) => void };
+  fields: {
+    [field: string]: FastFieldConnectors;
+  };
 
   getChildContext() {
     return {
@@ -296,8 +304,8 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
     this.initialValues = props.initialValues || ({} as any);
   }
 
-  registerField = (name: string, resetFn: (nextValues?: any) => void) => {
-    this.fields[name] = resetFn;
+  registerField = (name: string, connectors: FastFieldConnectors) => {
+    this.fields[name] = connectors;
   };
 
   unregisterField = (name: string) => {
@@ -342,8 +350,9 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
     );
   }
 
-  setErrors = (errors: FormikErrors<Values>) => {
+  setErrors = (errors: any) => {
     this.setState({ errors });
+    Object.keys(errors).forEach(f => this.fields[f].setError(errors[f]));
   };
 
   setTouched = (touched: FormikTouched<Values>) => {
@@ -360,6 +369,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
         this.runValidations(values);
       }
     });
+    Object.keys(values).forEach(f => this.fields[f].setValue(values[f]));
   };
 
   setStatus = (status?: any) => {
@@ -520,6 +530,9 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
         }
       }
     );
+    if (this.fields[field]) {
+      this.fields[field].setValue(value);
+    }
   };
 
   handleSubmit = (e: React.FormEvent<HTMLFormElement> | undefined) => {
@@ -592,6 +605,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
       }
 
       this.setState(prevState => ({
+        ...prevState,
         touched: setIn(prevState.touched, field, true),
       }));
 
@@ -636,6 +650,9 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
       ...prevState,
       errors: setIn(prevState.errors, field, message),
     }));
+    if (this.fields[field]) {
+      this.fields[field].setError(message);
+    }
   };
 
   resetForm = (nextValues?: Values) => {
@@ -652,7 +669,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
       values,
       submitCount: 0,
     });
-    Object.keys(this.fields).map(f => this.fields[f](values));
+    Object.keys(this.fields).map(f => this.fields[f].reset(values));
   };
 
   handleReset = () => {
@@ -713,7 +730,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
       ...this.getFormikActions(),
       ...this.getFormikComputedProps(),
 
-      // FastField needs to communicate with Formik during resets
+      // FastField needs to communicate with Formik
       registerField: this.registerField,
       unregisterField: this.unregisterField,
       handleBlur: this.handleBlur,
