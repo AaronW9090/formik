@@ -352,7 +352,11 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
 
   setErrors = (errors: any) => {
     this.setState({ errors });
-    Object.keys(errors).forEach(f => this.fields[f].setError(errors[f]));
+    Object.keys(errors).forEach(f => {
+      if (this.fields[f]) {
+        this.fields[f].setError(errors[f]);
+      }
+    });
   };
 
   setTouched = (touched: FormikTouched<Values>) => {
@@ -369,7 +373,11 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
         this.runValidations(values);
       }
     });
-    Object.keys(values).forEach(f => this.fields[f].setValue(values[f]));
+    Object.keys(values).forEach(f => {
+      if (this.fields[f]) {
+        this.fields[f].setValue(values[f]);
+      }
+    });
   };
 
   setStatus = (status?: any) => {
