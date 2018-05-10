@@ -408,12 +408,22 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
     validateYupSchema(values, schema).then(
       () => {
         this.setState({ errors: {} });
+        Object.keys(this.fields).forEach(f => {
+          this.fields[f].setError();
+        });
         if (onSuccess) {
           onSuccess();
         }
       },
-      (err: any) =>
-        this.setState({ errors: yupToFormErrors(err), isSubmitting: false })
+      (err: any) => {
+        const errors = yupToFormErrors(err) as any;
+        this.setState({ errors, isSubmitting: false });
+        Object.keys(errors).forEach(f => {
+          if (this.fields[f]) {
+            this.fields[f].setError(errors[f]);
+          }
+        });
+      }
     );
   };
 
@@ -431,8 +441,18 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
         (maybePromisedErrors as Promise<any>).then(
           () => {
             this.setState({ errors: {} });
+            Object.keys(this.fields).forEach(f => {
+              this.fields[f].setError();
+            });
           },
-          errors => this.setState({ errors, isSubmitting: false })
+          errors => {
+            this.setState({ errors, isSubmitting: false });
+            Object.keys(errors).forEach(f => {
+              if (this.fields[f]) {
+                this.fields[f].setError(errors[f]);
+              }
+            });
+          }
         );
       } else {
         this.setErrors(maybePromisedErrors as FormikErrors<Values>);
@@ -568,9 +588,19 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
         (maybePromisedErrors as Promise<any>).then(
           () => {
             this.setState({ errors: {} });
+            Object.keys(this.fields).forEach(f => {
+              this.fields[f].setError();
+            });
             this.executeSubmit();
           },
-          errors => this.setState({ errors, isSubmitting: false })
+          errors => {
+            this.setState({ errors, isSubmitting: false });
+            Object.keys(errors).forEach(f => {
+              if (this.fields[f]) {
+                this.fields[f].setError(errors[f]);
+              }
+            });
+          }
         );
         return;
       } else {
@@ -578,6 +608,11 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
         this.setState({
           errors: maybePromisedErrors as FormikErrors<Values>,
           isSubmitting: isValid,
+        });
+        Object.keys(maybePromisedErrors).forEach(f => {
+          if (this.fields[f]) {
+            this.fields[f].setError(maybePromisedErrors[f]);
+          }
         });
 
         // only submit if there are no errors
