@@ -148,6 +148,7 @@ export class FastField<
             error: getIn(maybePromise, this.props.name),
           });
         } else {
+          this.setState({ error: getIn(maybePromise, this.props.name) });
           setFormikState((prevState: any) => ({
             ...prevState,
             errors: maybePromise,
@@ -221,7 +222,7 @@ export class FastField<
       const maybePromise = (validate as any)(this.state.value);
       if (isPromise(maybePromise)) {
         (maybePromise as Promise<any>).then(
-          () => this.setFormikState(this.state.value, undefined),
+          () => this.setFormikState(this.state.value),
           error => this.setFormikState(this.state.value, error)
         );
       } else {
