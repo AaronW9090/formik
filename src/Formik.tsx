@@ -448,7 +448,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
           },
           errors => {
             this.setState({ errors, isSubmitting: false });
-            Object.keys(errors).forEach(f => {
+            Object.keys(flatten(errors)).forEach(f => {
               if (this.fields[f]) {
                 this.fields[f].setError(errors[f]);
               }
@@ -589,14 +589,14 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
         (maybePromisedErrors as Promise<any>).then(
           () => {
             this.setState({ errors: {} });
-            Object.keys(this.fields).forEach(f => {
+            Object.keys(flatten(this.fields)).forEach(f => {
               this.fields[f].setError();
             });
             this.executeSubmit();
           },
           errors => {
             this.setState({ errors, isSubmitting: false });
-            Object.keys(errors).forEach(f => {
+            Object.keys(flatten(errors)).forEach(f => {
               if (this.fields[f]) {
                 this.fields[f].setError(errors[f]);
               }
@@ -610,7 +610,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
           errors: maybePromisedErrors as FormikErrors<Values>,
           isSubmitting: isValid,
         });
-        Object.keys(maybePromisedErrors).forEach(f => {
+        Object.keys(flatten(maybePromisedErrors)).forEach(f => {
           if (this.fields[f]) {
             this.fields[f].setError(maybePromisedErrors[f]);
           }
