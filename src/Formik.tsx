@@ -9,6 +9,7 @@ import {
   isString,
   isNaN,
   isEmptyChildren,
+  getIn,
   setIn,
   setNestedObjectValues,
 } from './utils';
@@ -355,7 +356,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
     this.setState({ errors });
     Object.keys(flatten(errors)).forEach(f => {
       if (this.fields[f]) {
-        this.fields[f].setError(errors[f]);
+        this.fields[f].setError(getIn(errors, f));
       }
     });
   };
@@ -376,7 +377,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
     });
     Object.keys(flatten(values)).forEach(f => {
       if (this.fields[f]) {
-        this.fields[f].setValue(values[f]);
+        this.fields[f].setValue(getIn(values, f));
       }
     });
   };
@@ -450,7 +451,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
             this.setState({ errors, isSubmitting: false });
             Object.keys(flatten(errors)).forEach(f => {
               if (this.fields[f]) {
-                this.fields[f].setError(errors[f]);
+                this.fields[f].setError(getIn(errors, f));
               }
             });
           }
@@ -598,7 +599,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
             this.setState({ errors, isSubmitting: false });
             Object.keys(flatten(errors)).forEach(f => {
               if (this.fields[f]) {
-                this.fields[f].setError(errors[f]);
+                this.fields[f].setError(getIn(errors, f));
               }
             });
           }
@@ -612,7 +613,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
         });
         Object.keys(flatten(maybePromisedErrors)).forEach(f => {
           if (this.fields[f]) {
-            this.fields[f].setError(maybePromisedErrors[f]);
+            this.fields[f].setError(getIn(maybePromisedErrors, f));
           }
         });
 
