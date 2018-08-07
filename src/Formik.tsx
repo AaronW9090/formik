@@ -2,6 +2,7 @@ import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import isEqual from 'react-fast-compare';
 import warning from 'warning';
+import flatten from 'flat';
 import {
   isFunction,
   isPromise,
@@ -352,7 +353,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
 
   setErrors = (errors: any) => {
     this.setState({ errors });
-    Object.keys(errors).forEach(f => {
+    Object.keys(flatten(errors)).forEach(f => {
       if (this.fields[f]) {
         this.fields[f].setError(errors[f]);
       }
@@ -373,7 +374,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
         this.runValidations(values);
       }
     });
-    Object.keys(values).forEach(f => {
+    Object.keys(flatten(values)).forEach(f => {
       if (this.fields[f]) {
         this.fields[f].setValue(values[f]);
       }
