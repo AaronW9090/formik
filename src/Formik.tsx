@@ -354,10 +354,8 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
 
   setErrors = (errors: any) => {
     this.setState({ errors });
-    Object.keys(flatten(errors)).forEach(f => {
-      if (this.fields[f]) {
-        this.fields[f].setError(getIn(errors, f));
-      }
+    Object.keys(this.fields).forEach(f => {
+      this.fields[f].setError(getIn(errors, f));
     });
   };
 
