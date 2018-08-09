@@ -308,10 +308,30 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
 
   registerField = (name: string, connectors: FastFieldConnectors) => {
     this.fields[name] = connectors;
+    this.setState(prevState => ({
+      ...prevState,
+      values: { ...prevState.values, [name]: '' },
+    }));
   };
 
   unregisterField = (name: string) => {
     delete this.fields[name];
+    this.setState(prevState => {
+      const newValues = prevState.values;
+      const newErrors = prevState.errors;
+      const newTouched = prevState.touched;
+
+      delete newValues[name];
+      delete newErrors[name];
+      delete newTouched[name];
+
+      return {
+        ...prevState,
+        values: newValues,
+        errors: newErrors,
+        touched: newTouched,
+      };
+    });
   };
 
   componentWillReceiveProps(

@@ -85,6 +85,7 @@ export type FieldAttributes = GenericFieldHTMLAttributes & FieldConfig;
  * context and wiring up forms.
  */
 
+const noop = () => {};
 export class Field<Props extends FieldAttributes = any> extends React.Component<
   Props,
   {}
@@ -101,6 +102,24 @@ export class Field<Props extends FieldAttributes = any> extends React.Component<
     validate: PropTypes.func,
     innerRef: PropTypes.func,
   };
+
+  reset: Function;
+  setValue: Function;
+  setError: Function;
+
+  constructor(props: Props, context: any) {
+    super(props);
+
+    this.reset = noop;
+    this.setValue = noop;
+    this.setError = noop;
+
+    context.formik.registerField(props.name, {
+      reset: this.reset,
+      setValue: this.setValue,
+      setError: this.setError,
+    });
+  }
 
   componentWillMount() {
     const { render, children, component } = this.props;
