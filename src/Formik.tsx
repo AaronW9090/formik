@@ -183,7 +183,7 @@ export interface FormikConfig<Values> extends FormikSharedConfig {
   /**
    * Initial values of the form
    */
-  initialValues: Values;
+  initialValues: any;
 
   /**
    * Reset handler
@@ -271,7 +271,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
     formik: PropTypes.object,
   };
 
-  initialValues: Values;
+  initialValues: any;
 
   hcCache: {
     [key: string]: (e: string | React.ChangeEvent<any>) => void;
@@ -312,10 +312,12 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
       ...prevState,
       values: { ...prevState.values, [name]: '' },
     }));
+    this.initialValues[name] = '';
   };
 
   unregisterField = (name: string) => {
     delete this.fields[name];
+    delete this.initialValues[name];
     this.setState(prevState => {
       const newValues = prevState.values;
       const newErrors = prevState.errors;
@@ -719,7 +721,9 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
   };
 
   resetForm = (nextValues?: Values) => {
-    const values = nextValues ? nextValues : this.props.initialValues;
+    const values = nextValues
+      ? nextValues
+      : { ...this.initialValues, ...(this.props.initialValues as any) };
 
     this.initialValues = values;
 
