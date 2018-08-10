@@ -310,7 +310,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
     this.fields[name] = connectors;
     this.setState(prevState => ({
       ...prevState,
-      values: { ...prevState.values, [name]: '' },
+      values: setIn(prevState.values, name, ''),
     }));
     this.initialValues[name] = '';
   };
