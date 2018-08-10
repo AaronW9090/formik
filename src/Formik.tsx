@@ -312,16 +312,21 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
       ...prevState,
       values: setIn(prevState.values, name, ''),
     }));
-    this.initialValues[name] = '';
+    this.initialValues = setIn(this.initialValues, name, '');
   };
 
   unregisterField = (name: string) => {
+    const newInitialValues = flatten(this.initialValues) as any;
+
     delete this.fields[name];
-    delete this.initialValues[name];
+    delete newInitialValues[name];
+
+    this.initialValues = flatten.unflatten(newInitialValues);
+
     this.setState(prevState => {
-      const newValues = prevState.values;
-      const newErrors = prevState.errors;
-      const newTouched = prevState.touched;
+      const newValues = flatten(prevState.values) as any;
+      const newErrors = flatten(prevState.errors) as any;
+      const newTouched = flatten(prevState.touched) as any;
 
       delete newValues[name];
       delete newErrors[name];
@@ -329,9 +334,9 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
 
       return {
         ...prevState,
-        values: newValues,
-        errors: newErrors,
-        touched: newTouched,
+        values: flatten.unflatten(newValues),
+        errors: flatten.unflatten(newErrors),
+        touched: flatten.unflatten(newTouched),
       };
     });
   };
