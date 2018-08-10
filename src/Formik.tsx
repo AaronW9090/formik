@@ -308,11 +308,23 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
 
   registerField = (name: string, connectors: FastFieldConnectors) => {
     this.fields[name] = connectors;
-    this.setState(prevState => ({
-      ...prevState,
-      values: setIn(prevState.values, name, ''),
-    }));
-    this.initialValues = setIn(this.initialValues, name, '');
+    this.setState(prevState => {
+      const newValues = flatten(prevState.values);
+      if (!(newValues as any)[name]) {
+        (newValues as any)[name] = '';
+        return {
+          ...prevState,
+          values: flatten.unflatten(newValues),
+        };
+      } else {
+        return null;
+      }
+    });
+    const newInitialValues = flatten(this.initialValues);
+    if (!(newInitialValues as any)[name]) {
+      (newInitialValues as any)[name] = '';
+    }
+    this.initialValues = flatten.unflatten(newInitialValues);
   };
 
   unregisterField = (name: string) => {
