@@ -307,9 +307,10 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
   }
 
   registerField = (name: string, connectors: FastFieldConnectors) => {
+    const maxDepth = name.split('.').length;
     this.fields[name] = connectors;
     this.setState(prevState => {
-      const newValues = flatten(prevState.values);
+      const newValues = flatten(prevState.values, { maxDepth });
       if (!(newValues as any)[name]) {
         (newValues as any)[name] = '';
         return {
@@ -320,7 +321,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
         return null;
       }
     });
-    const newInitialValues = flatten(this.initialValues);
+    const newInitialValues = flatten(this.initialValues, { maxDepth });
     if (!(newInitialValues as any)[name]) {
       (newInitialValues as any)[name] = '';
     }
@@ -328,7 +329,8 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
   };
 
   unregisterField = (name: string) => {
-    const newInitialValues = flatten(this.initialValues) as any;
+    const maxDepth = name.split('.').length;
+    const newInitialValues = flatten(this.initialValues, { maxDepth }) as any;
 
     delete this.fields[name];
     delete newInitialValues[name];
@@ -336,9 +338,9 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
     this.initialValues = flatten.unflatten(newInitialValues);
 
     this.setState(prevState => {
-      const newValues = flatten(prevState.values) as any;
-      const newErrors = flatten(prevState.errors) as any;
-      const newTouched = flatten(prevState.touched) as any;
+      const newValues = flatten(prevState.values, { maxDepth }) as any;
+      const newErrors = flatten(prevState.errors, { maxDepth }) as any;
+      const newTouched = flatten(prevState.touched, { maxDepth }) as any;
 
       delete newValues[name];
       delete newErrors[name];
@@ -628,7 +630,9 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
           () => {
             this.setState({ errors: {} });
             Object.keys(flatten(this.fields)).forEach(f => {
-              this.fields[f].setError();
+              if (this.fields[f]) {
+                this.fields[f].setError();
+              }
             });
             this.executeSubmit();
           },
