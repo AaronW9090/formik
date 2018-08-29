@@ -311,7 +311,7 @@ export class Formik<ExtraProps = {}, Values = object> extends React.Component<
     this.fields[name] = connectors;
     this.setState(prevState => {
       const newValues = flatten(prevState.values, { maxDepth });
-      if (!(newValues as any)[name]) {
+      if ((newValues as any)[name] === undefined) {
         (newValues as any)[name] = '';
         return {
           ...prevState,
